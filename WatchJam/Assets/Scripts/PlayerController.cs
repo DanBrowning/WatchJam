@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour {
     public float FOVmin;
     public float FOVmax;
 
+    private bool Caninteract = false;
+    private bool DoorSwitch = false;
+
     // Use this for initialization
     void Start () {
         player = Rewired.ReInput.players.GetPlayer(playerNumber);
@@ -83,6 +86,33 @@ public class PlayerController : MonoBehaviour {
              pitch = Mathf.Clamp(pitch, FOVmin, FOVmax);
              transform.localEulerAngles = new Vector3(0.0f, yaw, 0.0f);
             fpsCamera.transform.localEulerAngles = new Vector3(pitch, 0.0f, 0.0f);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if(other.gameObject.tag == "Terminal")
+        {
+            Caninteract = true;
+            Debug.Log("Can Interact");
+            if(player.GetButtonDown("Interact") && Caninteract)
+            {
+                Caninteract = false;
+                UpdateDoors();
+            }
+        }
+    }
+    private void UpdateDoors()
+    {
+        if (DoorSwitch)
+        {
+            DoorSwitch = false;
+            Debug.Log("Closed");
+        }
+        else if (!DoorSwitch)
+        {
+            DoorSwitch = true;
+            Debug.Log("Open");
         }
     }
 }

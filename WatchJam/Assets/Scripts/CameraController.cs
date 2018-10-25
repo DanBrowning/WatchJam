@@ -14,12 +14,12 @@ public class CameraController : MonoBehaviour
     private float sensitivityY = 1.0f;
 
     public Transform player;
-    public Transform cameraTransform;
+    private Transform cameraTransform;
 
     public float cameraAngleMinY = -35.0f;
     public float cameraAngleMaxY = 50.0f;
     public float cameraDistance = 10.0f;
-    public Vector3 cameraOffset = new Vector3(0, 1, 5);
+    public Vector3 cameraOffset = new Vector3(0, 0, 0);
     public float smoothSpeed = 0.125f;
 
     [SerializeField] private float m_cameraRotationSpeed = 2f;
@@ -34,7 +34,9 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
+       this.transform.position = cameraOffset;
         cameraTransform = transform;
+       // 
     }
 
     private void Update()
@@ -62,6 +64,6 @@ public class CameraController : MonoBehaviour
         Vector3 desiredPosition = player.position + cameraOffset;
         Vector3 smoothPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
         cameraTransform.position = smoothPosition;
-        cameraTransform.LookAt(player.position);
+       // cameraTransform.LookAt(player.position);
     }
 }
