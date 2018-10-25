@@ -22,39 +22,43 @@ public class PlayerController : MonoBehaviour {
     public float FOVmax;
 
     private bool Caninteract = false;
-    private bool DoorSwitch = false;
+    
+
+    private DoorController doorManager;
 
     // Use this for initialization
     void Start () {
         player = Rewired.ReInput.players.GetPlayer(playerNumber);
         fpsCamera = this.GetComponentInChildren<Camera>();
+        doorManager = GameObject.FindObjectOfType<DoorController>();
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
         HandleInput();
-	}
+        
+    }
 
     void HandleInput()
     {
         if(player.GetAxis("HorizontalMove") > 0.0f)
         {
-            Debug.Log("MoveForward");
+          //  Debug.Log("MoveForward");
             transform.position += transform.forward * Time.deltaTime * speed;
         }
         if (player.GetAxis("HorizontalMove") < 0.0f)
         {
-            Debug.Log("MoveBackward");
+        //    Debug.Log("MoveBackward");
             transform.position -= transform.forward * Time.deltaTime * speed;
         }
         if (player.GetAxis("VerticalMove") > 0.0f)
         {
-            Debug.Log("MoveRight");
+           // Debug.Log("MoveRight");
             transform.position += transform.right * Time.deltaTime * speed;
         }
         if (player.GetAxis("VerticalMove") < 0.0f)
         {
-            Debug.Log("MoveLeft");
+           // Debug.Log("MoveLeft");
             transform.position -= transform.right * Time.deltaTime * speed;
         }
 
@@ -79,7 +83,7 @@ public class PlayerController : MonoBehaviour {
         //camera rotation
         if (rotX != 0.0f || rotY != 0.0f)
         {
-            Debug.Log("Rotate");
+           // Debug.Log("Rotate");
             yaw += horizontalCameraSpeed * player.GetAxis("RotHorizontal");
              pitch -= verticalCameraSpeed * player.GetAxis("RotVertical");
           
@@ -87,32 +91,37 @@ public class PlayerController : MonoBehaviour {
              transform.localEulerAngles = new Vector3(0.0f, yaw, 0.0f);
             fpsCamera.transform.localEulerAngles = new Vector3(pitch, 0.0f, 0.0f);
         }
+
+        if (player.GetButtonDown("Interact") && Caninteract)
+        {
+            Debug.Log("Can Interact");
+            // Caninteract = false;
+            if (this.gameObject.tag == "Monster" && doorManager.DoorOpen == false)
+            {
+                doorManager.DoorOpen = true;
+                doorManager.UpdateDoors();
+            }else if (this.gameObject.tag == "Security" && doorManager.DoorOpen == true)
+            {
+                doorManager.DoorOpen = false;
+                doorManager.UpdateDoors();
+            }
+        }
     }
 
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.tag == "Terminal")
         {
             Caninteract = true;
-            Debug.Log("Can Interact");
-            if(player.GetButtonDown("Interact") && Caninteract)
-            {
-                Caninteract = false;
-                UpdateDoors();
-            }
         }
     }
-    private void UpdateDoors()
+
+    private void OnTriggerExit(Collider other)
     {
-        if (DoorSwitch)
+        if (other.gameObject.tag == "Terminal")
         {
-            DoorSwitch = false;
-            Debug.Log("Closed");
-        }
-        else if (!DoorSwitch)
-        {
-            DoorSwitch = true;
-            Debug.Log("Open");
+            Caninteract = false;
         }
     }
+
 }
